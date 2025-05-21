@@ -13,6 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import rosa_alawiyah.rest_full_api_belajar.entity.User;
+import rosa_alawiyah.rest_full_api_belajar.model.ContactResponse;
 import rosa_alawiyah.rest_full_api_belajar.model.CreateContactRequest;
 import rosa_alawiyah.rest_full_api_belajar.model.RegisterUserRequest;
 import rosa_alawiyah.rest_full_api_belajar.model.Response;
@@ -60,6 +61,7 @@ public class ContactControllerTest {
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request))
+                        .header("X-API-TOKEN", "test")
         ).andExpectAll(
                 status().isBadRequest()
         ).andDo(result -> {
@@ -83,12 +85,19 @@ public class ContactControllerTest {
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request))
+                        .header("X-API-TOKEN", "test")
         ).andExpectAll(
                 status().isOk()
         ).andDo(result -> {
-            objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
+            Response<ContactResponse> response =  objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
             });
-            assertEquals(200, result.getResponse().getStatus());
+            assertNull(response.getErrorMessages());
+            assertEquals("Rosa", response.getData().getFirstName());
+            assertEquals("Alawiyah", response.getData().getLastName());
+            assertEquals("rosa@gmail.com", response.getData().getEmail());
+            assertEquals("6281212121", response.getData().getPhone());
+
+            assertTrue(contactRepository.existsById(response.getData().getId()));
         });
 
 

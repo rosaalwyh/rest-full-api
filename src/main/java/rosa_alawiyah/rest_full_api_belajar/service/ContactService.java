@@ -13,6 +13,7 @@ import rosa_alawiyah.rest_full_api_belajar.entity.User;
 import rosa_alawiyah.rest_full_api_belajar.model.ContactResponse;
 import rosa_alawiyah.rest_full_api_belajar.model.CreateContactRequest;
 import rosa_alawiyah.rest_full_api_belajar.repository.ContactRepository;
+import rosa_alawiyah.rest_full_api_belajar.repository.UserRepository;
 
 import java.util.UUID;
 
@@ -22,22 +23,29 @@ public class ContactService {
     private ContactRepository contactRepository;
     @Autowired
     private ValidationService validationService;
+    @Autowired
+    private UserRepository userRepository;
 
     @Transactional
-    public ContactResponse create(User user, CreateContactRequest request){
-
+    public ContactResponse create(User user, CreateContactRequest request) {
         validationService.validate(request);
 
+        User existingUser = userRepository.findById(user.getUsername())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid user"));
         Contact contact = new Contact();
         contact.setId(UUID.randomUUID().toString());
         contact.setFirstName(request.getFirstName());
         contact.setLastName(request.getLastName());
         contact.setEmail(request.getEmail());
         contact.setPhone(request.getPhone());
-        contact.setUser(user);
+        contact.setUser(existingUser);
 
         contactRepository.save(contact);
 
+        return toContactResponse(contact);
+    }
+
+    private ContactResponse toContactResponse(Contact contact) {
         return ContactResponse.builder()
                 .id(contact.getId())
                 .firstName(contact.getFirstName())
@@ -45,7 +53,6 @@ public class ContactService {
                 .email(contact.getEmail())
                 .phone(contact.getPhone())
                 .build();
-
     }
 
 }
