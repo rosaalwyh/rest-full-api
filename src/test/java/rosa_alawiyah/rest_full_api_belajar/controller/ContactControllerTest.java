@@ -12,6 +12,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import rosa_alawiyah.rest_full_api_belajar.entity.Contact;
 import rosa_alawiyah.rest_full_api_belajar.entity.User;
 import rosa_alawiyah.rest_full_api_belajar.model.ContactResponse;
 import rosa_alawiyah.rest_full_api_belajar.model.CreateContactRequest;
@@ -20,6 +21,8 @@ import rosa_alawiyah.rest_full_api_belajar.model.Response;
 import rosa_alawiyah.rest_full_api_belajar.repository.ContactRepository;
 import rosa_alawiyah.rest_full_api_belajar.repository.UserRepository;
 import rosa_alawiyah.rest_full_api_belajar.security.BCrypt;
+
+import java.util.UUID;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -101,5 +104,62 @@ public class ContactControllerTest {
         });
 
 
+    }
+
+    @Test
+    void getContactNotFound() throws Exception {
+        mockMvc.perform(
+                get("/api/contacts/23123123123")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("X-API-TOKEN", "test")
+        ).andExpectAll(
+                status().isNotFound()
+        ).andDo(result -> {
+            Response<String> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<Response<String>>() {
+            });
+            assertNotNull(response.getErrorMessages());
+        });
+    }
+
+    @Test
+    void getContactSuccess() throws Exception {
+        String token = UUID.randomUUID().toString();
+
+        User user = new User();
+        user.setUsername("rosa");
+        user.setName("rosa");
+        user.setToken(token);
+        user.setPassword(BCrypt.hashpw("test12345", BCrypt.gensalt()));
+        user.setTokenExpiredDate(System.currentTimeMillis() + 1000000);
+        userRepository.save(user);
+
+        Contact contact = new Contact();
+        contact.setId(UUID.randomUUID().toString());
+        contact.setUser(user);
+        contact.setFirstName("rosa");
+        contact.setLastName("alawiyah");
+        contact.setEmail("rosa@gmail.com");
+        contact.setPhone("628912716821");
+        contactRepository.save(contact);
+
+        mockMvc.perform(
+                get("/api/contacts/" + contact.getId())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("X-API-TOKEN", token)
+        ).andExpectAll(
+                status().isOk()
+        ).andDo(result -> {
+            Response<ContactResponse> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
+            });
+            assertNull(response.getErrorMessages());
+
+            assertEquals(contact.getId(), response.getData().getId());
+            assertEquals(contact.getFirstName(), response.getData().getFirstName());
+            assertEquals(contact.getLastName(), response.getData().getLastName());
+            assertEquals(contact.getEmail(), response.getData().getEmail());
+            assertEquals(contact.getPhone(), response.getData().getPhone());
+        });
     }
 }
