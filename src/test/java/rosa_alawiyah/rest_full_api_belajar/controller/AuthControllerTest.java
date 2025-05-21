@@ -44,16 +44,15 @@ public class AuthControllerTest {
         request.setPassword("test");
 
         mockMvc.perform(
-                post("/api/users")
+                post("/api/auth/login")
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request))
         ).andExpectAll(
-                status().isBadRequest()
+                status().isUnauthorized()
         ).andDo(result -> {
             Response<String> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
             });
-
             assertNotNull(response.getErrorMessages());
         });
     }

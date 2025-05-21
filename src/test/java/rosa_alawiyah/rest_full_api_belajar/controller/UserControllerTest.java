@@ -3,6 +3,7 @@ package rosa_alawiyah.rest_full_api_belajar.controller;
 import rosa_alawiyah.rest_full_api_belajar.entity.User;
 import rosa_alawiyah.rest_full_api_belajar.model.RegisterUserRequest;
 import rosa_alawiyah.rest_full_api_belajar.model.Response;
+import rosa_alawiyah.rest_full_api_belajar.repository.ContactRepository;
 import rosa_alawiyah.rest_full_api_belajar.repository.UserRepository;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -30,10 +31,14 @@ class UserControllerTest {
     private UserRepository userRepository;
 
     @Autowired
+    private ContactRepository contactRepository;
+
+    @Autowired
     private ObjectMapper objectMapper;
 
     @BeforeEach
     void setUp() {
+        contactRepository.deleteAll();
         userRepository.deleteAll();
     }
 
