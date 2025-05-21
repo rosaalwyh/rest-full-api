@@ -1,5 +1,6 @@
 package rosa_alawiyah.rest_full_api_belajar.controller;
 
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,7 +21,7 @@ public class UserController {
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public Response<String> register(@RequestBody RegisterUserRequest user) {
+    public Response<String> register(@Valid @RequestBody RegisterUserRequest user) {
         userService.register(user);
         return Response.<String>builder().message("Successfully register user").build();
     }

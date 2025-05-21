@@ -26,12 +26,12 @@ public class UserService {
     @Transactional
     public void register(RegisterUserRequest request) {
 
-        Set<ConstraintViolation<RegisterUserRequest>> constraintViolations = validator.validate(request);
-        if(constraintViolations.size() != 0) {
+        Set<ConstraintViolation<Object>> constraintViolations = validator.validate(request);
+        if (!constraintViolations.isEmpty()) {
             throw new ConstraintViolationException(constraintViolations);
         }
 
-        if(userRepository.existsById(request.getUsername())){
+        if (userRepository.existsByUsername(request.getUsername())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username already exists");
         }
 
