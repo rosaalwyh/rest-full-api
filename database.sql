@@ -31,3 +31,6 @@ CREATE TABLE contacts(
 SELECT * FROM contacts;
 
 DESC contacts;
+
+ALTER TABLE users
+    MODIFY COLUMN token VARCHAR(255);

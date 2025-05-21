@@ -12,18 +12,23 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 import rosa_alawiyah.rest_full_api_belajar.entity.Contact;
 import rosa_alawiyah.rest_full_api_belajar.entity.User;
 import rosa_alawiyah.rest_full_api_belajar.model.*;
 import rosa_alawiyah.rest_full_api_belajar.repository.ContactRepository;
 import rosa_alawiyah.rest_full_api_belajar.repository.UserRepository;
 import rosa_alawiyah.rest_full_api_belajar.security.BCrypt;
+import rosa_alawiyah.rest_full_api_belajar.security.TokenManager;
 
 import java.util.UUID;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@Transactional
 public class ContactControllerTest {
+    private String token;
+
     @Autowired
     private MockMvc mockMvc;
 
@@ -36,6 +41,9 @@ public class ContactControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @Autowired
+    private TokenManager tokenManager;
+
     @BeforeEach
     void setUp() {
         contactRepository.deleteAll();
@@ -45,7 +53,8 @@ public class ContactControllerTest {
         user.setUsername("rosa");
         user.setPassword(BCrypt.hashpw("rosa12345", BCrypt.gensalt()));
         user.setName("rosa");
-        user.setToken("test");
+        this.token = tokenManager.generateToken(user.getUsername());
+        user.setToken(this.token);
         user.setTokenExpiredDate(System.currentTimeMillis() + 1000000);
         userRepository.save(user);
     }
@@ -61,7 +70,8 @@ public class ContactControllerTest {
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request))
-                        .header("X-API-TOKEN", "test")
+                        .header("Authorization", "Bearer " + this.token)
+
         ).andExpectAll(
                 status().isBadRequest()
         ).andDo(result -> {
@@ -85,7 +95,7 @@ public class ContactControllerTest {
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request))
-                        .header("X-API-TOKEN", "test")
+                        .header("Authorization", "Bearer " + this.token)
         ).andExpectAll(
                 status().isOk()
         ).andDo(result -> {
@@ -109,7 +119,7 @@ public class ContactControllerTest {
                 get("/api/contacts/23123123123")
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("X-API-TOKEN", "test")
+                        .header("Authorization", "Bearer " + this.token)
         ).andExpectAll(
                 status().isNotFound()
         ).andDo(result -> {
@@ -121,9 +131,9 @@ public class ContactControllerTest {
 
     @Test
     void getContactSuccess() throws Exception {
-        String token = UUID.randomUUID().toString();
 
         User user = new User();
+        String token = tokenManager.generateToken(user.getUsername());
         user.setUsername("rosa");
         user.setName("rosa");
         user.setToken(token);
@@ -144,7 +154,7 @@ public class ContactControllerTest {
                 get("/api/contacts/" + contact.getId())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("X-API-TOKEN", token)
+                        .header("Authorization", "Bearer " + this.token)
         ).andExpectAll(
                 status().isOk()
         ).andDo(result -> {
@@ -171,7 +181,7 @@ public class ContactControllerTest {
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request))
-                        .header("X-API-TOKEN", "test")
+                        .header("Authorization", "Bearer " + this.token)
         ).andExpectAll(
                 status().isBadRequest()
         ).andDo(result -> {
@@ -183,7 +193,6 @@ public class ContactControllerTest {
 
     @Test
     void updateContactSuccess() throws Exception {
-        String token = UUID.randomUUID().toString();
         User user = new User();
         user.setUsername("rosa");
         user.setName("rosa");
@@ -212,7 +221,7 @@ public class ContactControllerTest {
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request))
-                        .header("X-API-TOKEN", token)
+                        .header("Authorization", "Bearer " + this.token)
         ).andExpectAll(
                 status().isOk()
         ).andDo(result -> {
@@ -234,7 +243,7 @@ public class ContactControllerTest {
                 delete("/api/contacts/23123123123")
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("X-API-TOKEN", "test")
+                        .header("Authorization", "Bearer " + this.token)
         ).andExpectAll(
                 status().isNotFound()
         ).andDo(result -> {
@@ -246,11 +255,10 @@ public class ContactControllerTest {
 
     @Test
     void deleteContactSuccess() throws Exception {
-        String token = UUID.randomUUID().toString();
         User user = new User();
         user.setUsername("rosa");
         user.setName("rosa");
-        user.setToken(token);
+        user.setToken(this.token);
         user.setPassword(BCrypt.hashpw("test12345", BCrypt.gensalt()));
         user.setTokenExpiredDate(System.currentTimeMillis() + 1000000);
         userRepository.save(user);
@@ -258,9 +266,9 @@ public class ContactControllerTest {
         Contact contact = new Contact();
         contact.setId(UUID.randomUUID().toString());
         contact.setUser(user);
-        contact.setFirstName("Eko");
-        contact.setLastName("Khanedy");
-        contact.setEmail("eko@example.com");
+        contact.setFirstName("Rosa");
+        contact.setLastName("alawiyah");
+        contact.setEmail("rosa@gmail.com");
         contact.setPhone("9238423432");
         contactRepository.save(contact);
 
@@ -268,7 +276,7 @@ public class ContactControllerTest {
                 delete("/api/contacts/" + contact.getId())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("X-API-TOKEN", token)
+                        .header("Authorization", "Bearer " + this.token)
         ).andExpectAll(
                 status().isOk()
         ).andDo(result -> {

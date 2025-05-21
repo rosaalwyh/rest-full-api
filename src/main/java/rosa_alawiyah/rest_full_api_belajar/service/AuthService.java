@@ -10,6 +10,7 @@ import rosa_alawiyah.rest_full_api_belajar.model.LoginUserRequest;
 import rosa_alawiyah.rest_full_api_belajar.model.TokenResponse;
 import rosa_alawiyah.rest_full_api_belajar.repository.UserRepository;
 import rosa_alawiyah.rest_full_api_belajar.security.BCrypt;
+import rosa_alawiyah.rest_full_api_belajar.security.TokenManager;
 
 import java.util.UUID;
 
@@ -22,6 +23,9 @@ public class AuthService {
     @Autowired
     private  ValidationService validationService;
 
+    @Autowired
+    private TokenManager tokenManager;
+
     @Transactional
     public TokenResponse login(LoginUserRequest request) {
         validationService.validate(request);
@@ -31,7 +35,9 @@ public class AuthService {
                         new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Username or password is incorrect"));
 
         if(BCrypt.checkpw(request.getPassword(), user.getPassword())) {
-            user.setToken(UUID.randomUUID().toString());
+
+            String token = tokenManager.generateToken(request.getUsername());
+            user.setToken(token);
             user.setTokenExpiredDate(next30Days());
             userRepository.save(user);
             return TokenResponse.builder()

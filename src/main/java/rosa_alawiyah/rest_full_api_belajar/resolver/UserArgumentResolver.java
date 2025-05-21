@@ -13,13 +13,17 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 import org.springframework.web.server.ResponseStatusException;
 import rosa_alawiyah.rest_full_api_belajar.entity.User;
 import rosa_alawiyah.rest_full_api_belajar.repository.UserRepository;
+import rosa_alawiyah.rest_full_api_belajar.security.TokenManager;
 
 @Component
 @Slf4j
-
 public class UserArgumentResolver implements HandlerMethodArgumentResolver {
+
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private TokenManager tokenManager;
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
@@ -27,22 +31,27 @@ public class UserArgumentResolver implements HandlerMethodArgumentResolver {
     }
 
     @Override
-    public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
+    public Object resolveArgument(MethodParameter parameter,
+                                  ModelAndViewContainer mavContainer,
+                                  NativeWebRequest webRequest,
+                                  WebDataBinderFactory binderFactory) throws Exception {
         HttpServletRequest servletRequest = (HttpServletRequest) webRequest.getNativeRequest();
-        String token = servletRequest.getHeader("X-API-TOKEN");
-        log.info("TOKEN {}", token);
-        if (token == null) {
+
+        String authHeader = servletRequest.getHeader("Authorization");
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized");
         }
 
-        User user = userRepository.findFirstByToken(token)
+        String token = authHeader.substring(7);
+        String username;
+        try {
+            username = tokenManager.validateToken(token);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized: " + e.getMessage());
+        }
+
+        return userRepository.findById(username)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized"));
 
-        log.info("USER {}", user);
-        if (user.getTokenExpiredDate() < System.currentTimeMillis()) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized");
-        }
-
-        return user;
     }
 }

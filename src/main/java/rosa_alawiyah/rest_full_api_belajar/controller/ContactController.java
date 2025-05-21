@@ -11,13 +11,13 @@ import rosa_alawiyah.rest_full_api_belajar.model.UpdateContactRequest;
 import rosa_alawiyah.rest_full_api_belajar.service.ContactService;
 
 @RestController
+@RequestMapping("/api/contacts")
 public class ContactController {
 
     @Autowired
     private ContactService contactService;
 
     @PostMapping(
-            path = "/api/contacts",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
@@ -28,7 +28,7 @@ public class ContactController {
 
 
     @GetMapping(
-            path = "/api/contacts/{id}",
+            path = "/{id}",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public Response<ContactResponse> get(User user, @PathVariable("id") String id) {
@@ -38,15 +38,15 @@ public class ContactController {
 
 
     @PutMapping(
-            path = "/api/contacts/{contactId}",
+            path = "/{id}",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public Response<ContactResponse> update(User user,
                                                @RequestBody UpdateContactRequest request,
-                                               @PathVariable("contactId") String contactId) {
+                                               @PathVariable("id") String id) {
 
-        request.setId(contactId);
+        request.setId(id);
 
         ContactResponse contactResponse = contactService.update(user, request);
         return Response.<ContactResponse>builder().data(contactResponse).build();
@@ -54,7 +54,7 @@ public class ContactController {
 
 
     @DeleteMapping(
-            path = "/api/contacts/{id}",
+            path = "/{id}",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public Response<String> delete(User user, @PathVariable("id") String id) {
