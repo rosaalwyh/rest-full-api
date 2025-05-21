@@ -16,6 +16,7 @@ import rosa_alawiyah.rest_full_api_belajar.entity.User;
 import rosa_alawiyah.rest_full_api_belajar.model.LoginUserRequest;
 import rosa_alawiyah.rest_full_api_belajar.model.Response;
 import rosa_alawiyah.rest_full_api_belajar.model.TokenResponse;
+import rosa_alawiyah.rest_full_api_belajar.repository.ContactRepository;
 import rosa_alawiyah.rest_full_api_belajar.repository.UserRepository;
 import rosa_alawiyah.rest_full_api_belajar.security.BCrypt;
 
@@ -27,12 +28,16 @@ public class AuthControllerTest {
 
     @Autowired
     UserRepository userRepository;
+
+    @Autowired
+    ContactRepository contactRepository;
     
     @Autowired
     private ObjectMapper objectMapper;
 
     @BeforeEach
     void setUp() {
+        contactRepository.deleteAll();
         userRepository.deleteAll();
     }
 
