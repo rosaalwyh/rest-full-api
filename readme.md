@@ -38,7 +38,3 @@ Aplikasi ini merupakan RESTful API untuk manajemen **contact**, mendukung regist
 
 ---
 
-## ⏳ Rate Limiting
-
-- Tiap user/IP hanya dapat melakukan sejumlah request tertentu per menit.
-- Jika melebihi batas, akan dibalas dengan:
