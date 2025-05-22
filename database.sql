@@ -28,6 +28,9 @@ CREATE TABLE contacts(
                          FOREIGN KEY fk_users_contacts (username) REFERENCES users (username)
 ) ENGINE InnoDb;
 
+ALTER TABLE contacts RENAME TO vendors;
+
+
 SELECT * FROM contacts;
 
 DESC contacts;

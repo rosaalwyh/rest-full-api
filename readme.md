@@ -1,7 +1,27 @@
 # 📇 Contact Management RESTful API
 
 ## 📌 Overview
-Aplikasi ini merupakan RESTful API untuk manajemen **contact**, mendukung registrasi user dan operasi CRUD (Create, Read, Update, Delete) terhadap data contact. API dilengkapi dengan **JWT Authentication** dan **rate limiting** untuk keamanan dan performa.
+
+Aplikasi ini adalah sebuah RESTful API yang dirancang untuk manajemen **Contact** secara efisien dan aman. API ini menyediakan fitur-fitur berikut:
+
+- ✅ **User Registration & Authentication** menggunakan **JWT (JSON Web Token)** untuk memastikan hanya pengguna yang terautentikasi dapat mengakses resource.
+- 📄 Operasi **CRUD** lengkap (Create, Read, Update, Delete) untuk data **Contact**.
+- 🧪 **Unit Testing** untuk memastikan kestabilan dan keandalan fitur.
+- 🗄️ Terintegrasi dengan **MySQL** sebagai sistem manajemen basis data.
+
+API ini dibangun dengan pendekatan clean code dan modular.
+
+---
+
+## 👩‍💻 Tech Stack
+
+- Java Spring Boot
+- JWT
+- Maven
+- Mysql
+- Lombok
+- SpringBoot Starter Data JPA
+- Spring Boot Starter Validation
 
 ---
 
@@ -37,4 +57,21 @@ Aplikasi ini merupakan RESTful API untuk manajemen **contact**, mendukung regist
 - Validasi input menggunakan anotasi `@Valid`.
 
 ---
+
+## 🚀 Cara Menjalankan Aplikasi
+
+Ikuti langkah-langkah berikut untuk menjalankan aplikasi ini secara lokal:
+
+### 1. 📦 Persyaratan Sistem
+
+Pastikan kamu sudah menginstal:
+
+- Java 17 atau lebih baru
+- Maven
+- MySQL Server
+- Postman (opsional, untuk testing API)
+
+### 2. ⚙️ Konfigurasi Database
+
+Buat database MySQL dengan nama sesuai konfigurasi `user_managements`.
 
