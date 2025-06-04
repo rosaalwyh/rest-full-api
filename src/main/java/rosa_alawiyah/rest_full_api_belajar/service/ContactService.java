@@ -29,17 +29,11 @@ public class ContactService {
     private UserRepository userRepository;
 
     @Transactional
-    public List<ContactResponse> list(){
-        return contactRepository.findAll().stream()
-                .map(
-                contact -> ContactResponse.builder()
-                        .id(contact.getId())
-                        .firstName(contact.getFirstName())
-                        .lastName(contact.getLastName())
-                        .email(contact.getEmail())
-                        .phone(contact.getPhone())
-                        .build()
-        ).collect(Collectors.toList());
+    public List<ContactResponse> list(User user) {
+
+        List<Contact> contacts = contactRepository.findAllByUser(user);
+        return contacts.stream().map(this::toContactResponse).toList();
+
     }
 
     @Transactional
