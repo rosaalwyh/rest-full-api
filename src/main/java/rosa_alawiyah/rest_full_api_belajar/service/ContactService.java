@@ -1,12 +1,6 @@
 package rosa_alawiyah.rest_full_api_belajar.service;
 
-import jakarta.persistence.criteria.Predicate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,7 +14,10 @@ import rosa_alawiyah.rest_full_api_belajar.repository.ContactRepository;
 import rosa_alawiyah.rest_full_api_belajar.repository.UserRepository;
 
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class ContactService {
@@ -30,6 +27,20 @@ public class ContactService {
     private ValidationService validationService;
     @Autowired
     private UserRepository userRepository;
+
+    @Transactional
+    public List<ContactResponse> list(){
+        return contactRepository.findAll().stream()
+                .map(
+                contact -> ContactResponse.builder()
+                        .id(contact.getId())
+                        .firstName(contact.getFirstName())
+                        .lastName(contact.getLastName())
+                        .email(contact.getEmail())
+                        .phone(contact.getPhone())
+                        .build()
+        ).collect(Collectors.toList());
+    }
 
     @Transactional
     public ContactResponse create(User user, CreateContactRequest request) {

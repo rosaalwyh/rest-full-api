@@ -1,5 +1,4 @@
 package rosa_alawiyah.rest_full_api_belajar.service;
-import org.antlr.v4.runtime.Token;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -12,7 +11,6 @@ import rosa_alawiyah.rest_full_api_belajar.repository.UserRepository;
 import rosa_alawiyah.rest_full_api_belajar.security.BCrypt;
 import rosa_alawiyah.rest_full_api_belajar.security.TokenManager;
 
-import java.util.UUID;
 
 @Service
 public class AuthService {

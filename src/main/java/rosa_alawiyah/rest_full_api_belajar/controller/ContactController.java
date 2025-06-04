@@ -9,7 +9,6 @@ import rosa_alawiyah.rest_full_api_belajar.model.CreateContactRequest;
 import rosa_alawiyah.rest_full_api_belajar.model.Response;
 import rosa_alawiyah.rest_full_api_belajar.model.UpdateContactRequest;
 import rosa_alawiyah.rest_full_api_belajar.service.ContactService;
-
 @RestController
 @RequestMapping("/api/contacts")
 public class ContactController {
@@ -23,7 +22,10 @@ public class ContactController {
     )
     public Response<ContactResponse> create (User user, @Valid @RequestBody CreateContactRequest request){
         ContactResponse contactResponse = contactService.create(user, request);
-        return Response.<ContactResponse>builder().data(contactResponse).build();
+        return Response.<ContactResponse>builder()
+                .data(contactResponse)
+                .message("Successully create contact")
+                .build();
     }
 
 
